@@ -1,0 +1,86 @@
+<%- include('../partials/head', { title: 'เมนูอาหาร' }) %>
+<body>
+<div class="phone">
+  <%- include('../partials/customer-header') %>
+
+  <!-- ===== ข้อความแจ้งเพิ่มลงตะกร้าสำเร็จ ===== -->
+  <% if (added) { %>
+    <div class="toast" role="status">เพิ่ม "<%= added %>" ลงตะกร้าแล้ว</div>
+  <% } %>
+
+  <!-- ===== ส่วนต้อนรับ ===== -->
+  <section class="welcome">
+    <div>
+      <h2>ยินดีต้อนรับ</h2>
+      <p>เลือกเมนูที่คุณต้องการได้เลย</p>
+    </div>
+    <div class="welcome-bowl">🥘</div>
+  </section>
+
+  <!-- ===== แท็บหมวดหมู่หลัก ===== -->
+  <nav class="tabs">
+    <a href="?tab=all" class="<%= tab === 'all' ? 'active' : '' %>">ทั้งหมด</a>
+    <a href="?tab=soup" class="<%= tab === 'soup' ? 'active' : '' %>">ซุป</a>
+    <a href="?tab=raw" class="<%= tab === 'raw' ? 'active' : '' %>">วัตถุดิบ</a>
+    <a href="?tab=snack" class="<%= tab === 'snack' ? 'active' : '' %>">ของทานเล่น</a>
+    <a href="?tab=drink" class="<%= tab === 'drink' ? 'active' : '' %>">เครื่องดื่ม</a>
+  </nav>
+
+  <!-- ===== รายการซุป (การ์ดรูปภาพ) ===== -->
+  <% if (tab === 'all' || tab === 'soup') { %>
+    <h3 class="section-title">เลือกประเภทน้ำซุป</h3>
+    <div class="soup-grid">
+      <% menus.filter(function (m) { return m.group === 'soup'; }).forEach(function (m) { %>
+        <a class="soup-card <%= m.soldOut ? 'soldout' : '' %>" href="/table/<%= table.Table_ID %>/item/<%= m.Menu_ID %>">
+          <div class="soup-img">
+            <% if (m.Image_URL) { %><img src="<%= m.Image_URL %>" alt="<%= m.Menu_Name %>"><% } else { %><%= CATEGORY_ICON[m.Category_Name] %><% } %>
+          </div>
+          <% if (m.soldOut) { %><span class="soldout-tag">สินค้าหมด</span><% } %>
+          <h4><%= m.Menu_Name %></h4>
+          <span class="price"><%= baht(m.Price) %> บาท</span>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <!-- ===== รายการวัตถุดิบ (แถบหมวดย่อยด้านซ้าย) ===== -->
+  <% if (tab === 'raw') { %>
+    <div class="raw-wrap">
+      <aside class="raw-side">
+        <% rawCats.forEach(function (c) { %>
+          <a href="?tab=raw&cat=<%= c.Category_ID %>" class="<%= c.Category_ID === selectedCat ? 'active' : '' %>"><%= c.Category_Name %></a>
+        <% }) %>
+      </aside>
+      <div class="raw-list">
+        <% menus.filter(function (m) { return m.Category_ID === selectedCat; }).forEach(function (m) { %>
+          <%- include('menu-row', { m: m }) %>
+        <% }) %>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- ===== รายการแบบแถว (หน้าทั้งหมด / ของทานเล่น / เครื่องดื่ม) ===== -->
+  <% if (tab === 'all' || tab === 'snack' || tab === 'drink') { %>
+    <% categories.filter(function (c) {
+         if (c.group === 'soup') return false;
+         return tab === 'all' || c.group === tab;
+       }).forEach(function (c) { %>
+      <h3 class="section-title"><%= CATEGORY_ICON[c.Category_Name] %> <%= c.Category_Name %></h3>
+      <div class="raw-list">
+        <% menus.filter(function (m) { return m.Category_ID === c.Category_ID; }).forEach(function (m) { %>
+          <%- include('menu-row', { m: m }) %>
+        <% }) %>
+      </div>
+    <% }) %>
+  <% } %>
+
+  <!-- ===== แถบตะกร้าสินค้าด้านล่าง ===== -->
+  <div class="bottom-bar">
+    <a class="bar-btn" href="/table/<%= table.Table_ID %>/cart">
+      <span>🛒 ตะกร้าสินค้า <% if (cartCount > 0) { %><span class="bar-count"><%= cartCount %></span><% } %></span>
+      <span><%= baht(cartTotal) %> บาท</span>
+    </a>
+  </div>
+</div>
+</body>
+</html>

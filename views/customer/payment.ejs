@@ -1,0 +1,79 @@
+<%- include('../partials/head', { title: 'ชำระเงิน' }) %>
+<body>
+<div class="phone">
+  <%- include('../partials/customer-header') %>
+
+  <!-- ===== หัวข้อหน้าชำระเงิน ===== -->
+  <div class="page-top"><h2>ชำระเงิน</h2></div>
+
+  <!-- ===== ยอดที่ต้องชำระ ===== -->
+  <div class="pay-total">
+    <span>ยอดที่ต้องชำระ</span>
+    <strong><%= baht(order.Total_Price) %> บาท</strong>
+  </div>
+
+  <!-- ===== ตัวเลือกช่องทางชำระเงิน ===== -->
+  <div class="pay-options">
+    <a class="pay-opt <%= method === 'qr' ? 'active' : '' %>" href="?method=qr">
+      <span class="ico">🔳</span>QR Code<small>สแกน QR จ่ายเงิน</small>
+    </a>
+    <form method="post" action="/table/<%= table.Table_ID %>/payment/<%= order.Order_ID %>/cash" style="margin:0">
+      <button class="pay-opt <%= method === 'cash' ? 'active' : '' %>" type="submit">
+        <span class="ico">💵</span>เงินสด<small>ชำระที่เคาน์เตอร์</small>
+      </button>
+    </form>
+  </div>
+
+  <% if (method === 'qr') { %>
+    <!-- ===== แสดง QR Code สำหรับสแกนจ่าย ===== -->
+    <section class="pay-panel">
+      <h3>สแกน QR Code</h3>
+      <div class="qr-box">
+        <img src="<%= qrImage %>" alt="QR Code สำหรับชำระเงิน">
+        <div>
+          <div class="muted">จำนวนเงิน</div>
+          <div class="ref-big" style="font-size:24px"><%= baht(order.Total_Price) %> บาท</div>
+          <div class="muted" style="margin-top:6px">รหัสอ้างอิง <%= order.Reference_Code %></div>
+        </div>
+      </div>
+      <form method="post" action="/table/<%= table.Table_ID %>/payment/<%= order.Order_ID %>/qr" style="margin-top:14px">
+        <button class="btn btn-green btn-block" type="submit">✔ ชำระเงินเรียบร้อย (จำลองการสแกนจ่าย)</button>
+      </form>
+    </section>
+  <% } else if (method === 'cash') { %>
+    <!-- ===== ข้อมูลสำหรับชำระเงินสดที่เคาน์เตอร์ ===== -->
+    <section class="pay-panel">
+      <h3>กรุณานำข้อมูลนี้ไปชำระที่เคาน์เตอร์</h3>
+      <table class="info-table">
+        <tr><td>หมายเลขโต๊ะ</td><td><%= table.Table_Number %></td></tr>
+        <tr><td>เลขอ้างอิงการชำระเงิน</td><td class="ref-big"><%= order.Reference_Code %></td></tr>
+        <tr><td>ยอดที่ต้องชำระ</td><td><%= baht(order.Total_Price) %> บาท</td></tr>
+      </table>
+      <p class="muted" style="margin:12px 0">แจ้งหมายเลขโต๊ะและเลขอ้างอิงให้พนักงานแคชเชียร์</p>
+      <a class="btn btn-red btn-block" href="/table/<%= table.Table_ID %>/order/<%= order.Order_ID %>">ดูสถานะคำสั่งซื้อ</a>
+    </section>
+  <% } %>
+
+  <!-- ===== นับเวลาถอยหลังก่อนเซสชันหมดอายุ ===== -->
+  <% if (!hasPayment) { %>
+    <p class="timer" id="timerBox">กรุณาเลือกช่องทางชำระเงินภายใน <b id="timer">--:--</b> นาที</p>
+    <script>
+      let left = <%= secondsLeft %>;
+      function tick() {
+        const m = String(Math.floor(left / 60)).padStart(2, '0');
+        const s = String(left % 60).padStart(2, '0');
+        document.getElementById('timer').textContent = m + ':' + s;
+        if (left <= 0) {
+          alert('เซสชันการสั่งซื้อหมดอายุ');
+          location.reload();
+          return;
+        }
+        left--;
+        setTimeout(tick, 1000);
+      }
+      tick();
+    </script>
+  <% } %>
+</div>
+</body>
+</html>

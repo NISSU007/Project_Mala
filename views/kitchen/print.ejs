@@ -1,0 +1,30 @@
+<%- include('../partials/head', { title: 'ใบรายการอาหาร ' + orderNo(order.Reference_Code) }) %>
+<body>
+<!-- ===== ใบเสร็จรายการอาหาร (แนบจาน) ===== -->
+<div class="slip">
+  <h2>🍲 หม่าล่า Self Service</h2>
+  <div class="big">#<%= orderNo(order.Reference_Code) %></div>
+  <p style="text-align:center;margin:0 0 8px">โต๊ะ <b><%= order.Table_Number %></b> · <%= order.Order_Time %> น. · <%= order.Order_Date %></p>
+  <table>
+    <% order.items.forEach(function (it) { %>
+      <tr>
+        <td>
+          <%= it.Menu_Name %>
+          <% if (it.Spiciness_Level) { %><br>- <%= it.Spiciness_Level %><% } %>
+          <% if (it.Special_Note) { %><br>- <%= it.Special_Note %><% } %>
+        </td>
+        <td class="r">x<%= it.Quantity %></td>
+      </tr>
+    <% }) %>
+  </table>
+  <p style="text-align:center;margin-top:10px">รวม <%= order.items.length %> รายการ</p>
+</div>
+
+<!-- ===== ปุ่มพิมพ์ ===== -->
+<div class="slip-actions no-print">
+  <button class="btn btn-red" onclick="window.print()">🖨️ พิมพ์อีกครั้ง</button>
+  <button class="btn btn-light" onclick="window.close()">ปิด</button>
+</div>
+<script>window.onload = function () { window.print(); };</script>
+</body>
+</html>

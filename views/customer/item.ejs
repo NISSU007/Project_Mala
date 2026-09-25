@@ -1,0 +1,88 @@
+<%- include('../partials/head', { title: menu.Menu_Name }) %>
+<body>
+<div class="phone">
+  <%- include('../partials/customer-header') %>
+
+  <!-- ===== ฟอร์มเพิ่มลงตะกร้า ===== -->
+  <form method="post" action="/table/<%= table.Table_ID %>/cart/add" id="itemForm">
+    <input type="hidden" name="menuId" value="<%= menu.Menu_ID %>">
+    <% if (editItem) { %><input type="hidden" name="detailId" value="<%= editItem.Order_Detail_ID %>"><% } %>
+
+    <!-- ===== ชื่อเมนู + ปุ่มปิด ===== -->
+    <div class="item-top">
+      <h2><%= menu.Menu_Name %></h2>
+      <a class="close-x" href="<%= editItem ? '/table/' + table.Table_ID + '/cart' : '/table/' + table.Table_ID + '/menu?tab=' + backTab + '&cat=' + menu.Category_ID %>" aria-label="ปิด">✕</a>
+    </div>
+
+    <!-- ===== รูปเมนู ===== -->
+    <div class="item-hero">
+      <% if (menu.Image_URL) { %><img src="<%= menu.Image_URL %>" alt="<%= menu.Menu_Name %>"><% } else { %><%= CATEGORY_ICON[menu.Category_Name] %><% } %>
+    </div>
+
+    <div class="item-body">
+      <p class="item-desc"><%= menu.Description %> · <b><%= baht(menu.Price) %> บาท</b></p>
+
+      <!-- ===== แจ้งเตือนข้อผิดพลาด ===== -->
+      <% if (error === 'spice') { %>
+        <div class="alert alert-red" role="alert">กรุณาเลือกระดับความเผ็ดก่อนเพิ่มลงตะกร้า</div>
+      <% } else if (error === 'soldout' || menu.soldOut) { %>
+        <div class="alert alert-red" role="alert">สินค้าหมด ไม่สามารถเลือกรายการนี้ได้</div>
+      <% } %>
+
+      <% if (menu.isSoup) { %>
+        <!-- ===== ตัวเลือกระดับความเผ็ด (บังคับ) ===== -->
+        <span class="field-label">เลือกระดับความเผ็ด <span class="req">* จำเป็น</span></span>
+        <div class="spice-grid">
+          <% spiceLevels.forEach(function (lv, i) { %>
+            <div class="spice-opt">
+              <input type="radio" name="spice" id="sp<%= i %>" value="<%= lv %>" required
+                <%= editItem && editItem.Spiciness_Level === lv ? 'checked' : '' %>>
+              <label for="sp<%= i %>">
+                <span class="chilis"><%= i === 0 ? '🫑' : '🌶️'.repeat(i) %></span>
+                <%= lv %>
+              </label>
+            </div>
+          <% }) %>
+        </div>
+        <input type="hidden" name="qty" value="1">
+      <% } else { %>
+        <!-- ===== ตัวเลือกจำนวน ===== -->
+        <span class="field-label">เลือกจำนวน</span>
+        <div class="qty">
+          <button type="button" onclick="changeQty(-1)" aria-label="ลดจำนวน">−</button>
+          <span class="qty-num" id="qtyText"><%= editItem ? editItem.Quantity : 1 %></span>
+          <button type="button" onclick="changeQty(1)" aria-label="เพิ่มจำนวน">+</button>
+        </div>
+        <input type="hidden" name="qty" id="qtyInput" value="<%= editItem ? editItem.Quantity : 1 %>">
+      <% } %>
+
+      <!-- ===== หมายเหตุ ===== -->
+      <label class="field-label" for="note">หมายเหตุ (ถ้ามี)</label>
+      <textarea class="note-input" id="note" name="note" rows="2" placeholder="เช่น ไม่ใส่ผักชี"><%= editItem ? editItem.Special_Note : '' %></textarea>
+    </div>
+
+    <!-- ===== ปุ่มเพิ่มลงตะกร้า ===== -->
+    <div class="bottom-bar">
+      <button class="bar-btn" type="submit" <%= menu.soldOut ? 'disabled' : '' %>>
+        <span><%= editItem ? 'บันทึกการแก้ไข' : 'เพิ่มลงตะกร้า' %></span>
+        <span><span id="priceText"><%= baht(menu.Price * (editItem ? editItem.Quantity : 1)) %></span> บาท</span>
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- ===== สคริปต์ปรับจำนวน / ราคา ===== -->
+<script>
+  const unitPrice = <%= menu.Price %>;
+  function changeQty(step) {
+    const input = document.getElementById('qtyInput');
+    let qty = parseInt(input.value) + step;
+    if (qty < 1) qty = 1;
+    if (qty > 99) qty = 99;
+    input.value = qty;
+    document.getElementById('qtyText').textContent = qty;
+    document.getElementById('priceText').textContent = (qty * unitPrice).toLocaleString('th-TH');
+  }
+</script>
+</body>
+</html>

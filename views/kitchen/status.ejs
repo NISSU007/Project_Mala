@@ -1,0 +1,65 @@
+<%- include('../partials/head', { title: 'อัปเดตสถานะออเดอร์ (ครัว)' }) %>
+<body>
+<div class="staff">
+  <%- include('../partials/staff-top', { roleLabel: 'ครัว' }) %>
+
+  <main class="s-main">
+    <!-- ===== หัวข้อหน้าอัปเดตสถานะ ===== -->
+    <div class="page-top" style="padding:0 0 14px">
+      <a class="back" href="/kitchen" aria-label="กลับไปหน้าออเดอร์ที่ต้องปรุง">←</a>
+      <h1 class="s-title" style="margin:0">อัปเดตสถานะออเดอร์</h1>
+    </div>
+
+    <div class="status-layout">
+      <!-- ===== รายการออเดอร์ที่กำลังเตรียม ===== -->
+      <section class="o-list">
+        <% if (list.length === 0) { %><p class="muted">ไม่มีออเดอร์ที่กำลังเตรียม</p><% } %>
+        <% list.forEach(function (o) { %>
+          <a class="o-row <%= selected && selected.Order_ID === o.Order_ID ? 'selected' : '' %>" href="?id=<%= o.Order_ID %>">
+            <div class="o-row-top">
+              <span class="o-no"><%= orderNo(o.Reference_Code) %></span>
+              <span>โต๊ะ <%= o.Table_Number %></span>
+              <span class="muted"><%= o.Order_Time %> น.</span>
+            </div>
+            <span class="badge badge-amber"><%= o.Order_Status %></span>
+          </a>
+        <% }) %>
+      </section>
+
+      <!-- ===== รายละเอียด + ขั้นตอนสถานะ ===== -->
+      <% if (selected) { %>
+        <section class="panel">
+          <div class="detail-head">
+            <div><span class="o-no"><%= orderNo(selected.Reference_Code) %></span> <span class="muted">โต๊ะ <%= selected.Table_Number %></span></div>
+            <span class="badge <%= selected.Order_Status === STATUS.PREPARING ? 'badge-amber' : 'badge-green' %>"><%= selected.Order_Status %></span>
+          </div>
+          <div class="food-visual">
+            <div class="plate">🍲</div>
+            <ul class="o-items" style="flex:1">
+              <% selected.items.forEach(function (it) { %>
+                <li><span>• <%= it.Menu_Name %> <% if (it.Spiciness_Level) { %><span class="spice">🌶 <%= it.Spiciness_Level %></span><% } %></span><span>x<%= it.Quantity %></span></li>
+              <% }) %>
+            </ul>
+          </div>
+
+          <h3>สถานะปัจจุบัน</h3>
+          <% var cooked = selected.Order_Status !== STATUS.PREPARING; %>
+          <ul class="vstep">
+            <li class="done"><span class="dot">✓</span>กำลังเตรียมอาหาร</li>
+            <li class="<%= cooked ? 'done' : 'now' %>"><span class="dot"><%= cooked ? '✓' : '🍳' %></span>ปรุงเสร็จสิ้น</li>
+            <li><span class="dot">•</span>พร้อมรับอาหาร</li>
+          </ul>
+
+          <!-- ===== ปุ่มเปลี่ยนเป็นปรุงเสร็จสิ้น ===== -->
+          <% if (!cooked) { %>
+            <form method="post" action="/kitchen/status/<%= selected.Order_ID %>">
+              <button class="btn btn-red btn-block" type="submit">✓ เปลี่ยนเป็น "ปรุงเสร็จสิ้น"</button>
+            </form>
+          <% } %>
+        </section>
+      <% } %>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<%- include('../partials/head', { title: 'ออเดอร์ของฉัน' }) %>
+<body>
+<div class="phone">
+  <%- include('../partials/customer-header') %>
+
+  <!-- ===== หัวข้อหน้าออเดอร์ของฉัน ===== -->
+  <div class="page-top">
+    <a class="back" href="/table/<%= table.Table_ID %>/menu" aria-label="กลับไปหน้าเมนู">←</a>
+    <h2>ออเดอร์ของโต๊ะนี้ (วันนี้)</h2>
+  </div>
+
+  <!-- ===== รายการออเดอร์ ===== -->
+  <div class="cart-list">
+    <% if (orders.length === 0) { %>
+      <div class="empty-state"><div class="big">🧾</div><p>ยังไม่มีออเดอร์</p></div>
+    <% } %>
+    <% orders.forEach(function (o) { %>
+      <a class="cart-item" href="/table/<%= table.Table_ID %>/<%= o.Order_Status === STATUS.WAIT_PAY ? 'payment' : 'order' %>/<%= o.Order_ID %>">
+        <div class="row-info">
+          <h4>#<%= orderNo(o.Reference_Code) %></h4>
+          <small class="muted"><%= o.Order_Time %> น. · <%= baht(o.Total_Price) %> บาท</small>
+        </div>
+        <span class="badge <%= o.Order_Status === STATUS.WAIT_PAY ? 'badge-red' : (o.Order_Status === STATUS.READY || o.Order_Status === STATUS.DONE) ? 'badge-green' : 'badge-amber' %>">
+          <%= o.Order_Status === STATUS.COOKED ? STATUS.PREPARING : o.Order_Status %>
+        </span>
+      </a>
+    <% }) %>
+  </div>
+</div>
+</body>
+</html>

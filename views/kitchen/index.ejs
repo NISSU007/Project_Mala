@@ -1,0 +1,86 @@
+<%- include('../partials/head', { title: 'ออเดอร์ที่ต้องปรุง', refresh: selected ? 0 : 10 }) %>
+<body>
+<div class="staff">
+  <%- include('../partials/staff-top', { roleLabel: 'ครัว' }) %>
+
+  <main class="s-main">
+    <!-- ===== หัวข้อหน้าครัว ===== -->
+    <h1 class="s-title">ออเดอร์ที่ต้องปรุง</h1>
+
+    <% if (success) { %><div class="alert alert-green" role="status">✔ ออเดอร์ #<%= success %> ปรุงเสร็จสิ้น ส่งไปหน้าเคาน์เตอร์แล้ว</div><% } %>
+
+    <!-- ===== ตัวเลขสรุปจำนวนออเดอร์ ===== -->
+    <div class="stat-row">
+      <div class="stat amber">📋 กำลังเตรียม <b><%= counts.preparing %></b> ออเดอร์</div>
+      <div class="stat green">🍲 ปรุงเสร็จแล้ว <b><%= counts.cooked %></b> ออเดอร์</div>
+      <div class="stat">✅ เสร็จสิ้นวันนี้ <b><%= counts.done %></b> ออเดอร์</div>
+    </div>
+
+    <!-- ===== แท็บกรอง + ช่องค้นหา ===== -->
+    <div class="s-filter">
+      <div class="s-tabs">
+        <a href="?tab=preparing" class="<%= tab === 'preparing' ? 'active' : '' %>">กำลังเตรียม</a>
+        <a href="?tab=cooked" class="<%= tab === 'cooked' ? 'active' : '' %>">ปรุงเสร็จแล้ว</a>
+        <a href="?tab=all" class="<%= tab === 'all' ? 'active' : '' %>">ทั้งหมด</a>
+        <a href="/kitchen/status">🔄 อัปเดตสถานะออเดอร์</a>
+      </div>
+      <form class="search" method="get">
+        <input type="hidden" name="tab" value="<%= tab %>">
+        <input type="search" name="q" value="<%= q %>" placeholder="🔍 ค้นหาเลขออเดอร์" aria-label="ค้นหาเลขออเดอร์">
+      </form>
+    </div>
+
+    <div class="s-layout <%= selected ? 'has-side' : '' %>">
+
+      <!-- ===== การ์ดออเดอร์ (เรียงตามเวลา) ===== -->
+      <section class="order-grid">
+        <% if (list.length === 0) { %><p class="muted">ไม่มีออเดอร์ในขณะนี้</p><% } %>
+        <% list.forEach(function (o) { %>
+          <a class="o-card <%= selected && selected.Order_ID === o.Order_ID ? 'selected' : '' %>" href="?tab=<%= tab %>&q=<%= q %>&id=<%= o.Order_ID %>">
+            <div class="o-card-head">
+              <span class="o-no"><%= orderNo(o.Reference_Code) %></span>
+              <span class="muted"><%= o.Order_Time %> น.</span>
+            </div>
+            <div class="o-meta"><span>โต๊ะ <%= o.Table_Number %></span><span><%= o.Item_Count %> รายการ</span></div>
+            <% if (tab === 'all') { %><span class="badge <%= o.Order_Status === STATUS.PREPARING ? 'badge-amber' : 'badge-green' %>"><%= o.Order_Status %></span><% } %>
+            <ul class="o-items">
+              <% o.items.forEach(function (it) { %>
+                <li>
+                  <span>• <%= it.Menu_Name %> <% if (it.Spiciness_Level) { %><span class="spice">🌶 <%= it.Spiciness_Level %></span><% } %></span>
+                  <span>x<%= it.Quantity %></span>
+                </li>
+              <% }) %>
+            </ul>
+            <% var notes = o.items.filter(function (it) { return it.Special_Note; }); %>
+            <span class="o-note">หมายเหตุ : <%= notes.length ? notes.map(function (n) { return n.Menu_Name + ' - ' + n.Special_Note; }).join(', ') : 'ไม่มี' %></span>
+          </a>
+        <% }) %>
+      </section>
+
+      <!-- ===== แผงรายละเอียดออเดอร์ที่เลือก ===== -->
+      <% if (selected) { %>
+        <aside class="panel">
+          <div class="detail-head">
+            <div>
+              <div class="muted">รายละเอียดออเดอร์ · โต๊ะ <%= selected.Table_Number %></div>
+              <span class="o-no"><%= orderNo(selected.Reference_Code) %></span>
+            </div>
+            <a class="close-x" href="?tab=<%= tab %>" aria-label="ปิด">✕</a>
+          </div>
+          <p class="muted" style="margin:0 0 8px">🕒 <%= selected.Order_Time %> น. · <%= selected.Order_Date %></p>
+          <%- include('../partials/items-table', { order: selected }) %>
+          <!-- ===== ปุ่มอัปเดตสถานะ / พิมพ์ใบเสร็จ ===== -->
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+            <% if (selected.Order_Status === STATUS.PREPARING) { %>
+              <a class="btn btn-amber btn-block" href="/kitchen/status?id=<%= selected.Order_ID %>">อัปเดตสถานะ</a>
+            <% } %>
+            <a class="btn btn-red btn-block" href="/kitchen/print/<%= selected.Order_ID %>" target="_blank">🖨️ พิมพ์ใบเสร็จ</a>
+          </div>
+        </aside>
+      <% } %>
+
+    </div>
+  </main>
+</div>
+</body>
+</html>

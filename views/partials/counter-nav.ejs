@@ -1,0 +1,10 @@
+<!-- ===== แถบเมนูล่างพนักงานหน้าเคาน์เตอร์ ===== -->
+<nav class="s-bottom-nav">
+  <a href="/counter" class="<%= page === 'ready' ? 'active' : '' %>">
+    🍽️ ออเดอร์ที่พร้อมเสิร์ฟ <% if (counts.cooked > 0) { %><span class="nav-count"><%= counts.cooked %></span><% } %>
+  </a>
+  <a href="/counter/status" class="<%= page === 'status' ? 'active' : '' %>">🔄 อัปเดตสถานะ</a>
+  <a href="/counter/notify" class="<%= page === 'notify' ? 'active' : '' %>">
+    🔔 แจ้งเตือน <% if (counts.ready > 0) { %><span class="nav-count"><%= counts.ready %></span><% } %>
+  </a>
+</nav>

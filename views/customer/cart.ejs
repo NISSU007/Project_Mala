@@ -1,0 +1,73 @@
+<%- include('../partials/head', { title: 'ตะกร้าสินค้า' }) %>
+<body>
+<div class="phone">
+  <%- include('../partials/customer-header') %>
+
+  <!-- ===== หัวข้อหน้าตะกร้า ===== -->
+  <div class="page-top">
+    <a class="back" href="/table/<%= table.Table_ID %>/menu" aria-label="กลับไปหน้าเมนู">←</a>
+    <h2>ตะกร้าสินค้า</h2>
+  </div>
+
+  <!-- ===== แจ้งเตือนข้อผิดพลาด ===== -->
+  <div style="padding:0 16px">
+    <% if (error === 'empty') { %>
+      <div class="alert alert-red" role="alert">ตะกร้าว่างเปล่า กรุณาเลือกอาหารก่อนยืนยันคำสั่งซื้อ</div>
+    <% } else if (error === 'expired') { %>
+      <div class="alert alert-red" role="alert">เซสชันการสั่งซื้อหมดอายุ รหัสอ้างอิงถูกยกเลิกแล้ว กรุณายืนยันคำสั่งซื้ออีกครั้ง</div>
+    <% } %>
+  </div>
+
+  <% if (items.length === 0) { %>
+    <!-- ===== ตะกร้าว่าง ===== -->
+    <div class="empty-state">
+      <div class="big">🛒</div>
+      <p>ยังไม่มีรายการในตะกร้า</p>
+      <a class="btn btn-red" href="/table/<%= table.Table_ID %>/menu">เลือกเมนูอาหาร</a>
+    </div>
+  <% } else { %>
+    <!-- ===== รายการสินค้าในตะกร้า ===== -->
+    <div class="cart-list">
+      <% items.forEach(function (it) { %>
+        <div class="cart-item">
+          <div class="row-img"><%= CATEGORY_ICON[it.Category_Name] %></div>
+          <div class="row-info">
+            <h4><%= it.Menu_Name %></h4>
+            <% if (it.Spiciness_Level) { %><small class="link-red">🌶 <%= it.Spiciness_Level %></small><% } %>
+            <% if (it.Special_Note) { %><small class="muted">หมายเหตุ: <%= it.Special_Note %></small><% } %>
+            <a class="link-btn" href="/table/<%= table.Table_ID %>/item/<%= it.Menu_ID %>?edit=<%= it.Order_Detail_ID %>">แก้ไข</a>
+          </div>
+          <div class="cart-right">
+            <span class="row-price"><%= baht(it.Subtotal) %> บาท</span>
+            <% if (!it.Soup_Type) { %>
+              <!-- ===== ปุ่มเพิ่ม/ลดจำนวน ===== -->
+              <div class="mini-qty">
+                <form method="post" action="/table/<%= table.Table_ID %>/cart/update/<%= it.Order_Detail_ID %>">
+                  <button name="action" value="minus" aria-label="ลดจำนวน">−</button>
+                </form>
+                <span><%= it.Quantity %></span>
+                <form method="post" action="/table/<%= table.Table_ID %>/cart/update/<%= it.Order_Detail_ID %>">
+                  <button name="action" value="plus" aria-label="เพิ่มจำนวน">+</button>
+                </form>
+              </div>
+            <% } %>
+            <!-- ===== ปุ่มลบรายการ ===== -->
+            <form method="post" action="/table/<%= table.Table_ID %>/cart/delete/<%= it.Order_Detail_ID %>">
+              <button class="link-btn link-red" type="submit">ลบ</button>
+            </form>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <!-- ===== ยอดรวมทั้งหมด ===== -->
+  <div class="total-row"><span>ยอดรวมทั้งหมด</span><strong><%= baht(total) %> บาท</strong></div>
+
+  <!-- ===== ปุ่มยืนยันคำสั่งซื้อ ===== -->
+  <form class="bottom-bar" method="post" action="/table/<%= table.Table_ID %>/cart/confirm">
+    <button class="bar-btn" type="submit" <%= items.length === 0 ? 'disabled' : '' %> style="justify-content:center">ยืนยันคำสั่งซื้อ</button>
+  </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<%- include('../partials/head', { title: 'ติดตามสถานะคำสั่งซื้อ' }) %>
+<body>
+<div class="phone">
+  <%- include('../partials/customer-header') %>
+
+  <%
+    var s = order.Order_Status;
+    var step = 0;
+    if (s === STATUS.PREPARING || s === STATUS.COOKED) step = 1;
+    if (s === STATUS.READY) step = 2;
+    if (s === STATUS.DONE) step = 3;
+    var badgeText = s === STATUS.COOKED ? STATUS.PREPARING : s;
+    var badgeClass = step === 0 ? 'badge-red' : step === 1 ? 'badge-amber' : 'badge-green';
+  %>
+
+  <!-- ===== หมายเลขออเดอร์ + สถานะ ===== -->
+  <section class="track-head">
+    <div>
+      <div class="muted">หมายเลขออเดอร์</div>
+      <div class="no">#<%= orderNo(order.Reference_Code) %></div>
+    </div>
+    <span class="badge <%= badgeClass %>" id="statusBadge"><%= badgeText %></span>
+  </section>
+
+  <!-- ===== แถบขั้นตอนสถานะ ===== -->
+  <div class="stepper">
+    <div class="step <%= step >= 1 ? 'done' : 'now' %>"><span class="dot">💳</span>ชำระเงิน</div>
+    <div class="step <%= step >= 2 ? 'done' : step === 1 ? 'now' : '' %>"><span class="dot">🍳</span>กำลังเตรียมอาหาร</div>
+    <div class="step <%= step >= 3 ? 'done' : step === 2 ? 'now' : '' %>"><span class="dot">🍲</span>พร้อมรับอาหาร</div>
+  </div>
+
+  <!-- ===== ข้อความตามสถานะ ===== -->
+  <div style="padding:0 16px">
+    <% if (step === 0) { %>
+      <div class="alert alert-red">รอชำระเงิน · แจ้งเลขอ้างอิง <b><%= order.Reference_Code %></b> ที่เคาน์เตอร์</div>
+    <% } else if (step === 2) { %>
+      <div class="alert alert-green">อาหารพร้อมแล้ว! กรุณารับอาหารที่เคาน์เตอร์</div>
+    <% } else if (step === 3) { %>
+      <div class="alert alert-green">รับอาหารเรียบร้อย ขอให้อร่อยนะคะ 🙏</div>
+    <% } %>
+  </div>
+
+  <!-- ===== รายละเอียดคำสั่งซื้อ ===== -->
+  <section class="detail-box">
+    <h3>รายละเอียดคำสั่งซื้อ</h3>
+    <% order.items.forEach(function (it) { %>
+      <div class="detail-row">
+        <div>
+          <%= CATEGORY_ICON[it.Category_Name] %> <%= it.Menu_Name %>
+          <% if (it.Spiciness_Level) { %><small>🌶 <%= it.Spiciness_Level %></small><% } %>
+          <% if (it.Special_Note) { %><small><%= it.Special_Note %></small><% } %>
+        </div>
+        <div class="r"><%= it.Quantity %> ชุด</div>
+        <div class="r"><%= baht(it.Subtotal) %> ฿</div>
+      </div>
+    <% }) %>
+    <div class="detail-row" style="font-family:var(--font-head);font-weight:600">
+      <div>ยอดรวม</div><div></div><div class="r"><%= baht(order.Total_Price) %> ฿</div>
+    </div>
+  </section>
+
+  <!-- ===== แถบบอกการแจ้งเตือน ===== -->
+  <div class="notice-bar">
+    <span class="bell">🔔</span>
+    <span>เมื่ออาหารพร้อมรับ จะมีแจ้งเตือนขึ้นบนหน้าจอนี้ กรุณาเปิดหน้านี้ไว้</span>
+  </div>
+
+  <!-- ===== ปุ่มสั่งอาหารเพิ่ม ===== -->
+  <div style="padding:0 16px">
+    <a class="btn btn-light btn-block" href="/table/<%= table.Table_ID %>/menu">สั่งอาหารเพิ่ม</a>
+  </div>
+
+  <!-- ===== ป๊อปอัปแจ้งเตือนอาหารพร้อม ===== -->
+  <div class="modal-bg hidden" id="readyModal" role="dialog" aria-modal="true" aria-labelledby="readyTitle">
+    <div class="modal">
+      <div class="big">🔔</div>
+      <h2 id="readyTitle">อาหารพร้อมเสิร์ฟแล้ว!</h2>
+      <p>ออเดอร์ <b>#<%= orderNo(order.Reference_Code) %></b><br>กรุณารับอาหารที่เคาน์เตอร์</p>
+      <button class="btn btn-red btn-block" onclick="closeModal()">รับทราบ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== สคริปต์เช็คสถานะอัตโนมัติ + แจ้งเตือน ===== -->
+<script>
+  const orderId = <%= order.Order_ID %>;
+  let lastStatus = '<%= order.Order_Status %>';
+  let seenNotify = Number(sessionStorage.getItem('seen-' + orderId) || 0);
+  let currentNotify = <%= notify %>;
+
+  function beep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [0, 0.35, 0.7].forEach(function (t) {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.frequency.value = 880;
+        o.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(0.25, ctx.currentTime + t);
+        o.start(ctx.currentTime + t);
+        o.stop(ctx.currentTime + t + 0.2);
+      });
+    } catch (e) {}
+    if (navigator.vibrate) navigator.vibrate([300, 150, 300]);
+  }
+
+  function showModal() {
+    document.getElementById('readyModal').classList.remove('hidden');
+    beep();
+  }
+  function closeModal() {
+    document.getElementById('readyModal').classList.add('hidden');
+    seenNotify = currentNotify;
+    sessionStorage.setItem('seen-' + orderId, seenNotify);
+  }
+
+  if (lastStatus === '<%= STATUS.READY %>' && currentNotify > seenNotify) showModal();
+
+  setInterval(function () {
+    fetch('/api/order/' + orderId)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.ok) return;
+        if (data.status !== lastStatus) { location.reload(); return; }
+        currentNotify = data.notify;
+        if (data.status === '<%= STATUS.READY %>' && data.notify > seenNotify) showModal();
+      });
+  }, 3000);
+</script>
+</body>
+</html>

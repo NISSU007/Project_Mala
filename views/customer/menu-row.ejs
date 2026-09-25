@@ -1,0 +1,15 @@
+<!-- ===== แถวรายการเมนู 1 รายการ ===== -->
+<a class="row-item <%= m.soldOut ? 'soldout' : '' %>" href="/table/<%= table.Table_ID %>/item/<%= m.Menu_ID %>">
+  <div class="row-img">
+    <% if (m.Image_URL) { %><img src="<%= m.Image_URL %>" alt="<%= m.Menu_Name %>"><% } else { %><%= CATEGORY_ICON[m.Category_Name] %><% } %>
+  </div>
+  <div class="row-info">
+    <h4><%= m.Menu_Name %></h4>
+    <small><%= m.Description %></small>
+  </div>
+  <% if (m.soldOut) { %>
+    <span class="soldout-tag">สินค้าหมด</span>
+  <% } else { %>
+    <span class="row-price"><%= baht(m.Price) %> บาท</span>
+  <% } %>
+</a>

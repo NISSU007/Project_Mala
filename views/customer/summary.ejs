@@ -1,0 +1,37 @@
+<%- include('../partials/head', { title: 'สรุปรายการสั่งซื้อ' }) %>
+<body>
+<div class="phone">
+  <%- include('../partials/customer-header') %>
+
+  <!-- ===== หัวข้อหน้าสรุปรายการ ===== -->
+  <div class="page-top">
+    <a class="back" href="/table/<%= table.Table_ID %>/cart" aria-label="กลับไปแก้ไขตะกร้า">←</a>
+    <h2>สรุปรายการสั่งซื้อ</h2>
+  </div>
+  <p class="muted" style="margin:0 16px 12px">ตรวจสอบรายการให้ถูกต้องก่อนชำระเงิน</p>
+
+  <!-- ===== รายการสินค้า (อ่านอย่างเดียว) ===== -->
+  <div class="cart-list">
+    <% items.forEach(function (it) { %>
+      <div class="cart-item">
+        <div class="row-img"><%= CATEGORY_ICON[it.Category_Name] %></div>
+        <div class="row-info">
+          <h4><%= it.Menu_Name %></h4>
+          <% if (it.Spiciness_Level) { %><small class="link-red">🌶 <%= it.Spiciness_Level %></small><% } %>
+          <small class="muted">จำนวน <%= it.Quantity %> ชุด<%= it.Special_Note ? ' · ' + it.Special_Note : '' %></small>
+        </div>
+        <span class="row-price"><%= baht(it.Subtotal) %> บาท</span>
+      </div>
+    <% }) %>
+  </div>
+
+  <!-- ===== ยอดรวมทั้งหมด ===== -->
+  <div class="total-row"><span>ยอดรวมทั้งหมด</span><strong><%= baht(total) %> บาท</strong></div>
+
+  <!-- ===== ปุ่มชำระเงิน ===== -->
+  <form class="bottom-bar" method="post" action="/table/<%= table.Table_ID %>/checkout">
+    <button class="bar-btn" type="submit" style="justify-content:center">ชำระเงิน</button>
+  </form>
+</div>
+</body>
+</html>

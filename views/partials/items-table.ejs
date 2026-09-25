@@ -1,0 +1,22 @@
+<!-- ===== ตารางรายการอาหารในออเดอร์ (ใช้ร่วมหน้าพนักงาน) ===== -->
+<table class="items-table">
+  <thead>
+    <tr><th>เมนู</th><th class="r">จำนวน</th><th class="r">ราคารวม</th></tr>
+  </thead>
+  <tbody>
+    <% order.items.forEach(function (it) { %>
+    <tr>
+      <td>
+        <%= CATEGORY_ICON[it.Category_Name] || '🍽️' %> <%= it.Menu_Name %>
+        <% if (it.Spiciness_Level) { %><br><small class="o-items"><span class="spice">🌶 <%= it.Spiciness_Level %></span></small><% } %>
+        <% if (it.Special_Note) { %><br><small class="muted">หมายเหตุ: <%= it.Special_Note %></small><% } %>
+      </td>
+      <td class="r"><%= it.Quantity %> ชุด</td>
+      <td class="r"><%= baht(it.Subtotal) %> ฿</td>
+    </tr>
+    <% }) %>
+  </tbody>
+  <tfoot>
+    <tr><td colspan="2">ยอดรวม</td><td class="r"><%= baht(order.Total_Price) %> ฿</td></tr>
+  </tfoot>
+</table>

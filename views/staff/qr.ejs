@@ -1,0 +1,34 @@
+<%- include('../partials/head', { title: 'QR Code ประจำโต๊ะ' }) %>
+<body>
+<!-- ===== หน้า QR Code ประจำโต๊ะ ===== -->
+<main class="qr-page">
+
+  <!-- ===== แถบเครื่องมือ (เปลี่ยนที่อยู่ / พิมพ์) ===== -->
+  <div class="no-print">
+    <div class="page-top" style="padding:0 0 12px">
+      <a class="back" href="<%= single ? '/qr' : '/' %>" aria-label="ย้อนกลับ">←</a>
+      <h2><%= single ? 'QR Code ' + tables[0].Table_Name : 'QR Code ประจำโต๊ะ' %></h2>
+    </div>
+    <form class="qr-toolbar" method="get">
+      <input type="text" name="base" value="<%= baseURL %>" aria-label="ที่อยู่เว็บที่ใช้สร้าง QR">
+      <button class="btn btn-light" type="submit">สร้าง QR ใหม่</button>
+      <button class="btn btn-red" type="button" onclick="window.print()">🖨️ พิมพ์</button>
+    </form>
+  </div>
+
+  <!-- ===== การ์ด QR Code แต่ละโต๊ะ ===== -->
+  <div class="<%= single ? 'qr-single' : 'qr-grid' %>">
+    <% tables.forEach(function (t) { %>
+    <a class="qr-card" href="<%= single ? t.QR_Code_URL : '/qr/' + t.Table_ID + '?base=' + encodeURIComponent(baseURL) %>">
+      <div class="brand">🍲 หม่าล่า Self Service</div>
+      <div class="table-no">โต๊ะ <%= t.Table_Number %></div>
+      <img src="<%= t.qrImage %>" alt="QR Code โต๊ะ <%= t.Table_Number %>">
+      <div class="hint">สแกนเพื่อสั่งอาหาร</div>
+      <div class="url"><%= t.fullURL %></div>
+    </a>
+    <% }) %>
+  </div>
+
+</main>
+</body>
+</html>
