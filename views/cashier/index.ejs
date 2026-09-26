@@ -1,4 +1,4 @@
-<%- include('../partials/head', { title: 'คิดเงินสด', refresh: selected ? 0 : 15 }) %>
+<%- include('../partials/head', {css: 'cashier', title: 'คิดเงินสด', refresh: selected ? 0 : 15 }) %>
 <body>
 <div class="staff">
   <%- include('../partials/staff-top', { roleLabel: 'แคชเชียร์' }) %>
@@ -60,7 +60,13 @@
             </div>
           </div>
           <h4 style="margin:8px 0">รายการอาหาร</h4>
+          
+          <!-- ========================================================================= -->
+          <!-- [หมายเหตุถึงผู้พัฒนา]: โค้ดส่วนที่แสดงรายชื่ออาหารจะอยู่ในไฟล์ views/partials/items-table.ejs -->
+          <!-- คุณต้องเข้าไปเพิ่มโค้ดแสดง (ตัวเลือกน้ำซุป) ต่อท้ายชื่อเมนูในไฟล์นั้นแทนครับ -->
+          <!-- ========================================================================= -->
           <%- include('../partials/items-table', { order: selected }) %>
+          
         <% } %>
       </section>
 

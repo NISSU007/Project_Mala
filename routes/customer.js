@@ -119,7 +119,17 @@ router.post('/table/:tableId/cart/add', async (req, res) => {
     }
 
     const spiceValue = isSoup ? spice : null;
-    const soupValue = isSoup ? menu.Menu_Name : null;
+    
+    // ===== [แก้ไข/เพิ่มเติม] รับค่าและจัดรูปแบบน้ำซุป 2 รสชาติ =====
+    let soupValue = isSoup ? menu.Menu_Name : null;
+    const mixedSoups = req.body['mixed_soups[]'] || req.body.mixed_soups;
+    
+    if (isSoup && menu.Menu_Name.includes('ต้องการผสม2น้ำ') && mixedSoups) {
+      // หากรับค่ามาเป็น Array ให้นำมาต่อกันด้วยลูกน้ำ เช่น "หม่าล่าดั้งเดิม, น้ำดำ"
+      soupValue = Array.isArray(mixedSoups) ? mixedSoups.join(', ') : mixedSoups;
+    }
+    // =========================================================
+
     const noteValue = (note || '').trim();
     const finalQty = isSoup ? 1 : qty;
 
@@ -140,6 +150,7 @@ router.post('/table/:tableId/cart/add', async (req, res) => {
        AND IFNULL(Spiciness_Level,'') = ? AND IFNULL(Special_Note,'') = ?`,
       [cart.Order_ID, menu.Menu_ID, spiceValue || '', noteValue]
     );
+    
     if (same && !isSoup) {
       const newQty = same.Quantity + finalQty;
       await dbRun('UPDATE Order_Detail SET Quantity = ?, Subtotal = ? WHERE Order_Detail_ID = ?',

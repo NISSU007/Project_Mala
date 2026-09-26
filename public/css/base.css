@@ -1,0 +1,138 @@
+/* ===== ตัวแปรสี / ฟอนต์ ===== */
+:root {
+  --chili: #c62a1f;
+  --chili-dark: #8e1a13;
+  --chili-soft: #fde9e6;
+  --ink: #2b1512;
+  --muted: #7a6560;
+  --line: #eadfdc;
+  --bg: #f5f2f1;
+  --paper: #ffffff;
+  --jade: #1f8a5b;
+  --jade-soft: #e3f4ec;
+  --amber: #e39a2d;
+  --amber-soft: #fff3de;
+  --radius-lg: 18px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font-head: 'Kanit', 'Sarabun', sans-serif;
+  --font-body: 'Sarabun', 'Kanit', sans-serif;
+}
+
+/* ===== ค่าพื้นฐาน ===== */
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--bg);
+}
+h1, h2, h3, h4 { font-family: var(--font-head); font-weight: 600; margin: 0; line-height: 1.25; }
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font-head); cursor: pointer; }
+input, textarea { font-family: var(--font-body); font-size: 16px; }
+:focus-visible { outline: 3px solid #f2b705; outline-offset: 2px; }
+.muted { color: var(--muted); }
+.hidden { display: none !important; }
+
+/* ===== ปุ่ม ===== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 0; border-radius: var(--radius); padding: 12px 18px;
+  font-size: 16px; font-weight: 500; background: var(--ink); color: #fff;
+}
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn-red { background: var(--chili); }
+.btn-red:hover:not(:disabled) { background: var(--chili-dark); }
+.btn-green { background: var(--jade); }
+.btn-amber { background: var(--amber); }
+.btn-light { background: var(--paper); color: var(--ink); border: 1.5px solid var(--line); }
+.btn-block { width: 100%; }
+.btn-sm { padding: 6px 12px; font-size: 14px; border-radius: var(--radius-sm); }
+
+/* ===== ป้ายสถานะ ===== */
+.badge {
+  display: inline-block; padding: 2px 10px; border-radius: 999px;
+  font-family: var(--font-head); font-size: 13px; font-weight: 500; white-space: nowrap;
+}
+.badge-red { background: var(--chili-soft); color: var(--chili-dark); }
+.badge-green { background: var(--jade-soft); color: var(--jade); }
+.badge-amber { background: var(--amber-soft); color: #9a5b00; }
+.badge-gray { background: #eee; color: #555; }
+
+/* ===== กล่องข้อความแจ้งเตือน ===== */
+.alert { padding: 12px 16px; border-radius: var(--radius); margin: 12px 0; font-weight: 500; }
+.alert-red { background: var(--chili-soft); color: var(--chili-dark); border: 1px solid #f5c2bc; }
+.alert-green { background: var(--jade-soft); color: var(--jade); border: 1px solid #b9e3cf; }
+.toast {
+  position: fixed; left: 50%; top: 16px; transform: translateX(-50%);
+  background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 999px;
+  font-family: var(--font-head); z-index: 50; animation: toast 2.8s forwards;
+  max-width: 90vw; text-align: center;
+}
+@keyframes toast { 0%{opacity:0; top:0} 10%{opacity:1; top:16px} 85%{opacity:1} 100%{opacity:0} }
+
+/* ===== โครงสร้างหลักของหน้าพนักงาน ===== */
+.staff { min-height: 100vh; display: flex; flex-direction: column; }
+.s-top { background: var(--paper); border-bottom: 2px solid var(--ink); padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.s-brand { font-family: var(--font-head); font-weight: 700; font-size: 18px; }
+.s-brand small { font-weight: 400; color: var(--muted); font-size: 14px; margin-left: 6px; }
+.s-user { display: flex; align-items: center; gap: 8px; font-family: var(--font-head); }
+.s-user .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+.s-main { flex: 1; padding: 20px 24px 100px; }
+.s-title { font-size: 26px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+.s-layout { display: grid; grid-template-columns: 1fr; gap: 18px; align-items: start; }
+.s-layout.has-side { grid-template-columns: minmax(0, 1fr) 380px; }
+.panel { background: var(--paper); border: 1.5px solid var(--line); border-radius: var(--radius-lg); padding: 16px; }
+.panel h3 { font-size: 18px; margin-bottom: 10px; }
+
+/* ===== หน้าแรก (เลือกระบบ) ===== */
+.home { max-width: 980px; margin: 0 auto; padding: 32px 20px 60px; }
+.home-hero { display: flex; align-items: center; gap: 18px; margin-bottom: 28px; }
+.home-hero .bowl { font-size: 64px; }
+.home-hero h1 { font-size: 36px; }
+.home-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 28px; }
+.home-card { background: var(--paper); border: 2px solid var(--ink); border-radius: var(--radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 6px; }
+.home-card:hover { background: var(--chili-soft); }
+.home-card .ico { font-size: 34px; }
+.home-card h3 { font-size: 19px; }
+.home-card p { margin: 0; color: var(--muted); font-size: 14px; }
+.table-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.table-links a { padding: 8px 14px; border: 1.5px solid var(--ink); border-radius: var(--radius-sm); background: #fff; font-family: var(--font-head); }
+
+/* ===== หน้า QR Code ประจำโต๊ะ ===== */
+.qr-page { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
+.qr-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
+.qr-toolbar input { flex: 1; min-width: 240px; padding: 10px 12px; border: 1.5px solid var(--ink); border-radius: var(--radius-sm); }
+.qr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 18px; }
+.qr-card { background: #fff; border: 3px solid var(--chili); border-radius: 22px; padding: 18px; text-align: center; break-inside: avoid; }
+.qr-card .brand { font-family: var(--font-head); font-weight: 700; font-size: 18px; }
+.qr-card .table-no { font-family: var(--font-head); font-size: 44px; font-weight: 700; color: var(--chili); line-height: 1.1; margin: 4px 0; }
+.qr-card img { width: 100%; max-width: 220px; aspect-ratio: 1; }
+.qr-card .hint { font-family: var(--font-head); margin: 6px 0 2px; }
+.qr-card .url { font-size: 12px; color: var(--muted); word-break: break-all; }
+.qr-single { display: flex; justify-content: center; }
+.qr-single .qr-card { max-width: 520px; width: 100%; padding: 28px; }
+.qr-single .qr-card img { max-width: 420px; }
+.qr-single .table-no { font-size: 64px; }
+
+/* ===== ตั้งค่าการพิมพ์ (Print) ===== */
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; }
+  .slip { border: 0; margin: 0 auto; }
+  .qr-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ===== Responsive พื้นฐาน ===== */
+@media (max-width: 820px) {
+  .s-layout.has-side { grid-template-columns: 1fr; }
+  .s-main { padding: 16px 14px 100px; }
+}
+
+/* ===== ลดการเคลื่อนไหว ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

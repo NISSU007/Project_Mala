@@ -1,4 +1,4 @@
-<%- include('../partials/head', { title: menu.Menu_Name }) %>
+<%- include('../partials/head', {css: 'customer', title: menu.Menu_Name }) %>
 <body>
 <div class="phone">
   <%- include('../partials/customer-header') %>
@@ -30,6 +30,32 @@
       <% } %>
 
       <% if (menu.isSoup) { %>
+        
+        <!-- ===== [เพิ่มใหม่] ตัวเลือกสำหรับน้ำซุปแบบผสม 2 รสชาติ ===== -->
+        <!-- เช็คจากชื่อเมนูว่ามีคำว่า "2 รสชาติ" หรือไม่ (สามารถปรับแก้คำเช็คได้ตามฐานข้อมูลของคุณ) -->
+        <% if (menu.Menu_Name.includes('ต้องการผสม2น้ำ')) { %>
+          <span class="field-label">เลือกประเภทน้ำซุป (เลือก 2 อย่าง) <span class="req">* จำเป็น</span></span>
+          <div class="soup-mix-grid">
+            <div class="mix-opt">
+              <input type="checkbox" name="mixed_soups[]" value="หม่าล่าดั้งเดิม" id="soup1" class="soup-cb">
+              <label for="soup1">หม่าล่าดั้งเดิม</label>
+            </div>
+            <div class="mix-opt">
+              <input type="checkbox" name="mixed_soups[]" value="หม่าล่าต้มยำ" id="soup2" class="soup-cb">
+              <label for="soup2">หม่าล่าต้มยำ</label>
+            </div>
+            <div class="mix-opt">
+              <input type="checkbox" name="mixed_soups[]" value="กระดูกหมู" id="soup3" class="soup-cb">
+              <label for="soup3">กระดูกหมู</label>
+            </div>
+            <div class="mix-opt">
+              <input type="checkbox" name="mixed_soups[]" value="น้ำดำ" id="soup4" class="soup-cb">
+              <label for="soup4">น้ำดำ</label>
+            </div>
+          </div>
+        <% } %>
+        <!-- =================================================== -->
+
         <!-- ===== ตัวเลือกระดับความเผ็ด (บังคับ) ===== -->
         <span class="field-label">เลือกระดับความเผ็ด <span class="req">* จำเป็น</span></span>
         <div class="spice-grid">
@@ -63,7 +89,7 @@
 
     <!-- ===== ปุ่มเพิ่มลงตะกร้า ===== -->
     <div class="bottom-bar">
-      <button class="bar-btn" type="submit" <%= menu.soldOut ? 'disabled' : '' %>>
+      <button class="bar-btn" type="submit" id="submitCartBtn" <%= menu.soldOut ? 'disabled' : '' %>>
         <span><%= editItem ? 'บันทึกการแก้ไข' : 'เพิ่มลงตะกร้า' %></span>
         <span><span id="priceText"><%= baht(menu.Price * (editItem ? editItem.Quantity : 1)) %></span> บาท</span>
       </button>
@@ -71,7 +97,7 @@
   </form>
 </div>
 
-<!-- ===== สคริปต์ปรับจำนวน / ราคา ===== -->
+<!-- ===== สคริปต์ปรับจำนวน / ราคา และ ตรวจสอบการเลือกน้ำซุป ===== -->
 <script>
   const unitPrice = <%= menu.Price %>;
   function changeQty(step) {
@@ -83,6 +109,40 @@
     document.getElementById('qtyText').textContent = qty;
     document.getElementById('priceText').textContent = (qty * unitPrice).toLocaleString('th-TH');
   }
+
+  // ===== [เพิ่มใหม่] สคริปต์ควบคุมการเลือกน้ำซุป 2 อย่าง =====
+  document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.soup-cb');
+    const submitBtn = document.getElementById('submitCartBtn');
+
+    if (checkboxes.length > 0 && submitBtn) {
+      // 1. เริ่มต้น ปิดปุ่ม "เพิ่มลงตะกร้า" ไว้ก่อนจนกว่าจะเลือกครบ 2 อย่าง
+      submitBtn.disabled = true;
+
+      checkboxes.forEach(cb => {
+        cb.addEventListener('change', function() {
+          const checkedCount = document.querySelectorAll('.soup-cb:checked').length;
+
+          if (checkedCount >= 2) {
+            // 2. ถ้าเลือกครบ 2 อย่างแล้ว ให้ล็อคปุ่มที่ยังไม่ได้เลือกไม่ให้กดได้อีก
+            checkboxes.forEach(box => {
+              if (!box.checked) box.disabled = true;
+            });
+            // 3. ปลดล็อคให้กดปุ่ม "เพิ่มลงตะกร้า" ได้
+            submitBtn.disabled = false;
+          } else {
+            // 4. ถ้ายังเลือกไม่ครบ 2 อย่าง (เช่น กดยกเลิกไป 1 อัน) ให้ปลดล็อคปุ่มตัวเลือกทั้งหมด
+            checkboxes.forEach(box => {
+              box.disabled = false;
+            });
+            // 5. ปิดปุ่ม "เพิ่มลงตะกร้า" กลับเหมือนเดิม
+            submitBtn.disabled = true;
+          }
+        });
+      });
+    }
+  });
+  // ====================================================
 </script>
 </body>
 </html>

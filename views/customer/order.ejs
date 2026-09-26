@@ -1,4 +1,4 @@
-<%- include('../partials/head', { title: 'ติดตามสถานะคำสั่งซื้อ' }) %>
+<%- include('../partials/head', {css: 'customer', title: 'ติดตามสถานะคำสั่งซื้อ' }) %>
 <body>
 <div class="phone">
   <%- include('../partials/customer-header') %>
@@ -47,6 +47,13 @@
       <div class="detail-row">
         <div>
           <%= CATEGORY_ICON[it.Category_Name] %> <%= it.Menu_Name %>
+          
+          <!-- ===== [แก้ไข/เพิ่มเติม] แสดงชื่อเมนูพร้อมวงเล็บตัวเลือกน้ำซุป ===== -->
+          <% if (it.Menu_Name.includes('ต้องการผสม2น้ำ') && it.Soup_Type) { %>
+            <span style="font-size: 0.85em; color: #555;">(<%= it.Soup_Type %>)</span>
+          <% } %>
+          <!-- ========================================================= -->
+
           <% if (it.Spiciness_Level) { %><small>🌶 <%= it.Spiciness_Level %></small><% } %>
           <% if (it.Special_Note) { %><small><%= it.Special_Note %></small><% } %>
         </div>

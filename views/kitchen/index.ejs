@@ -1,4 +1,4 @@
-<%- include('../partials/head', { title: 'ออเดอร์ที่ต้องปรุง', refresh: selected ? 0 : 10 }) %>
+<%- include('../partials/head', {css: 'kitchen', title: 'ออเดอร์ที่ต้องปรุง', refresh: selected ? 0 : 10 }) %>
 <body>
 <div class="staff">
   <%- include('../partials/staff-top', { roleLabel: 'ครัว' }) %>
@@ -46,7 +46,17 @@
             <ul class="o-items">
               <% o.items.forEach(function (it) { %>
                 <li>
-                  <span>• <%= it.Menu_Name %> <% if (it.Spiciness_Level) { %><span class="spice">🌶 <%= it.Spiciness_Level %></span><% } %></span>
+                  <span>
+                    • <%= it.Menu_Name %> 
+                    
+                    <!-- ===== [แก้ไข/เพิ่มเติม] แสดงตัวเลือกน้ำซุปในวงเล็บ (สำหรับการ์ดออเดอร์) ===== -->
+                    <% if (it.Menu_Name.includes('ต้องการผสม2น้ำ') && it.Soup_Type) { %>
+                      <span style="font-size: 0.85em; color: #555; font-weight: normal;">(<%= it.Soup_Type %>)</span>
+                    <% } %>
+                    <!-- ================================================================= -->
+
+                    <% if (it.Spiciness_Level) { %><span class="spice">🌶 <%= it.Spiciness_Level %></span><% } %>
+                  </span>
                   <span>x<%= it.Quantity %></span>
                 </li>
               <% }) %>
@@ -68,7 +78,13 @@
             <a class="close-x" href="?tab=<%= tab %>" aria-label="ปิด">✕</a>
           </div>
           <p class="muted" style="margin:0 0 8px">🕒 <%= selected.Order_Time %> น. · <%= selected.Order_Date %></p>
+          
+          <!-- ========================================================================= -->
+          <!-- [หมายเหตุถึงผู้พัฒนา]: รายละเอียดตารางอาหารฝั่งขวาจะเรียกใช้จาก views/partials/items-table.ejs -->
+          <!-- คุณต้องไปเพิ่มโค้ดแสดง (ตัวเลือกน้ำซุป) ในไฟล์นั้นด้วยเพื่อให้ตารางฝั่งขวาแสดงข้อมูลถูกต้อง -->
+          <!-- ========================================================================= -->
           <%- include('../partials/items-table', { order: selected }) %>
+
           <!-- ===== ปุ่มอัปเดตสถานะ / พิมพ์ใบเสร็จ ===== -->
           <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
             <% if (selected.Order_Status === STATUS.PREPARING) { %>
@@ -84,3 +100,4 @@
 </div>
 </body>
 </html>
+```[cite: 24]

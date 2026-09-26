@@ -1,4 +1,4 @@
-<%- include('../partials/head', { title: 'สรุปรายการสั่งซื้อ' }) %>
+<%- include('../partials/head', {css: 'customer', title: 'สรุปรายการสั่งซื้อ' }) %>
 <body>
 <div class="phone">
   <%- include('../partials/customer-header') %>
@@ -16,7 +16,16 @@
       <div class="cart-item">
         <div class="row-img"><%= CATEGORY_ICON[it.Category_Name] %></div>
         <div class="row-info">
-          <h4><%= it.Menu_Name %></h4>
+          
+          <!-- ===== [แก้ไข/เพิ่มเติม] แสดงชื่อเมนูพร้อมวงเล็บตัวเลือกน้ำซุป ===== -->
+          <h4>
+            <%= it.Menu_Name %>
+            <% if (it.Menu_Name.includes('ต้องการผสม2น้ำ') && it.Soup_Type) { %>
+              <span style="font-size: 0.85em; color: #555; font-weight: normal;">(<%= it.Soup_Type %>)</span>
+            <% } %>
+          </h4>
+          <!-- ========================================================= -->
+
           <% if (it.Spiciness_Level) { %><small class="link-red">🌶 <%= it.Spiciness_Level %></small><% } %>
           <small class="muted">จำนวน <%= it.Quantity %> ชุด<%= it.Special_Note ? ' · ' + it.Special_Note : '' %></small>
         </div>
