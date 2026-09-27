@@ -22,10 +22,14 @@
             <div class="o-meta"><span>โต๊ะ <%= o.Table_Number %></span><span><%= o.Item_Count %> รายการ</span></div>
             <ul class="o-items">
               <% o.items.forEach(function (it) { %>
-                <li><span>• <%= it.Menu_Name %> <% if (it.Spiciness_Level) { %><span class="spice">🌶 <%= it.Spiciness_Level %></span><% } %></span><span>x<%= it.Quantity %></span></li>
+                <!-- ===== แสดงชื่อเมนู ระดับความเผ็ด และจำนวน ===== -->
+                <li>
+                  <span>• <%= it.Menu_Name %> <% if (it.Spiciness_Level) { %><span class="spice">🌶 <%= it.Spiciness_Level %></span><% } %></span>
+                  <span>x<%= it.Quantity %></span>
+                </li>
               <% }) %>
             </ul>
-            <!-- ===== ปุ่มอัปเดตสถานะ / รายละเอียด ===== -->
+            <!-- ===== ปุ่มอัปเดตสถานะ / ดูรายละเอียด ===== -->
             <div class="o-actions">
               <a class="btn btn-green btn-sm" href="/counter/status?id=<%= o.Order_ID %>">อัปเดตสถานะ</a>
               <a class="btn btn-light btn-sm" href="?id=<%= o.Order_ID %>">รายละเอียด</a>
@@ -34,7 +38,7 @@
         <% }) %>
       </section>
 
-      <!-- ===== แผงรายละเอียดออเดอร์ ===== -->
+      <!-- ===== แผงรายละเอียดออเดอร์ (ด้านขวาเมื่อกดดูรายละเอียด) ===== -->
       <% if (selected) { %>
         <aside class="panel">
           <div class="detail-head">
@@ -44,6 +48,7 @@
             </div>
             <a class="close-x" href="/counter" aria-label="ปิด">✕</a>
           </div>
+          <!-- ===== ดึงตารางรายการอาหารมาแสดงจาก partials ===== -->
           <%- include('../partials/items-table', { order: selected }) %>
         </aside>
       <% } %>

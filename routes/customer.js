@@ -120,17 +120,11 @@ router.post('/table/:tableId/cart/add', async (req, res) => {
 
     const spiceValue = isSoup ? spice : null;
     
-    // ===== [แก้ไข/เพิ่มเติม] รับค่าและจัดรูปแบบน้ำซุป 2 รสชาติ =====
-    let soupValue = isSoup ? menu.Menu_Name : null;
-    const mixedSoups = req.body['mixed_soups[]'] || req.body.mixed_soups;
-    
-    if (isSoup && menu.Menu_Name.includes('ต้องการผสม2น้ำ') && mixedSoups) {
-      // หากรับค่ามาเป็น Array ให้นำมาต่อกันด้วยลูกน้ำ เช่น "หม่าล่าดั้งเดิม, น้ำดำ"
-      soupValue = Array.isArray(mixedSoups) ? mixedSoups.join(', ') : mixedSoups;
-    }
-    // =========================================================
-
+    // ===== ลบส่วนจัดการ 2 น้ำซุปออก และให้กลับมาเก็บค่าชื่อเมนูตามเดิม =====
+    const soupValue = isSoup ? menu.Menu_Name : null; 
     const noteValue = (note || '').trim();
+    // ==============================================================
+
     const finalQty = isSoup ? 1 : qty;
 
     const cart = await getOrCreateCart(tableId);
