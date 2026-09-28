@@ -5,7 +5,9 @@
   </div>
   <div class="row-info">
     <h4><%= m.Menu_Name %></h4>
-    <small><%= m.Description %></small>
+    <% if (m.Serving_Qty && m.Serving_Unit) { %>
+      <small style="color: #666;"><%= m.Serving_Qty %> <%= m.Serving_Unit %></small>
+    <% } %>
   </div>
   <% if (m.soldOut) { %>
     <span class="soldout-tag">สินค้าหมด</span>

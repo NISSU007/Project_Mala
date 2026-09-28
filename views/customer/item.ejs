@@ -8,10 +8,22 @@
     <input type="hidden" name="menuId" value="<%= menu.Menu_ID %>">
     <% if (editItem) { %><input type="hidden" name="detailId" value="<%= editItem.Order_Detail_ID %>"><% } %>
 
-    <!-- ===== ชื่อเมนู + ปุ่มปิด ===== -->
-    <div class="item-top">
-      <h2><%= menu.Menu_Name %></h2>
+    <!-- ===== ปุ่มปิด (ขวาบน) ===== -->
+    <div class="item-close-bar">
       <a class="close-x" href="<%= editItem ? '/table/' + table.Table_ID + '/cart' : '/table/' + table.Table_ID + '/menu?tab=' + backTab + '&cat=' + menu.Category_ID %>" aria-label="ปิด">✕</a>
+    </div>
+
+    <!-- ===== ชื่อเมนู + ปริมาณ (ซ้าย) และ ราคา (ขวา) อยู่ระดับเดียวกัน ===== -->
+    <div class="item-top">
+      <div class="item-title-wrap">
+        <h2>
+          <%= menu.Menu_Name %>
+          <% if (menu.Serving_Qty && menu.Serving_Unit) { %>
+            <span class="item-serving">(<%= menu.Serving_Qty %> <%= menu.Serving_Unit %>)</span>
+          <% } %>
+        </h2>
+      </div>
+      <div class="item-top-price"><%= baht(menu.Price) %> บาท</div>
     </div>
 
     <!-- ===== รูปเมนู ===== -->
@@ -20,7 +32,9 @@
     </div>
 
     <div class="item-body">
-      <p class="item-desc"><%= menu.Description %> · <b><%= baht(menu.Price) %> บาท</b></p>
+      <% if (menu.Description) { %>
+        <p class="item-desc"><%= menu.Description %></p>
+      <% } %>
 
       <!-- ===== แจ้งเตือนข้อผิดพลาด ===== -->
       <% if (error === 'spice') { %>
@@ -30,9 +44,6 @@
       <% } %>
 
       <% if (menu.isSoup) { %>
-        
-        <!-- ===== ลบส่วนตัวเลือก 2 น้ำซุปออก เหลือแค่ตัวเลือกระดับความเผ็ด ===== -->
-        
         <!-- ===== ตัวเลือกระดับความเผ็ด (บังคับ) ===== -->
         <span class="field-label">เลือกระดับความเผ็ด <span class="req">* จำเป็น</span></span>
         <div class="spice-grid">
@@ -50,12 +61,12 @@
         <input type="hidden" name="qty" value="1">
       <% } else { %>
         <!-- ===== ตัวเลือกจำนวน ===== -->
-        <span class="field-label">เลือกจำนวน</span>
         <div class="qty">
           <button type="button" onclick="changeQty(-1)" aria-label="ลดจำนวน">−</button>
           <span class="qty-num" id="qtyText"><%= editItem ? editItem.Quantity : 1 %></span>
           <button type="button" onclick="changeQty(1)" aria-label="เพิ่มจำนวน">+</button>
         </div>
+        <div class="qty-label-bottom">เลือกจำนวน</div>
         <input type="hidden" name="qty" id="qtyInput" value="<%= editItem ? editItem.Quantity : 1 %>">
       <% } %>
 
@@ -86,8 +97,6 @@
     document.getElementById('qtyText').textContent = qty;
     document.getElementById('priceText').textContent = (qty * unitPrice).toLocaleString('th-TH');
   }
-
-  // ===== ลบสคริปต์ควบคุมการเลือกน้ำซุป 2 อย่างออกไปแล้ว =====
 </script>
 </body>
 </html>

@@ -77,7 +77,7 @@ async function getOrCreateCart(tableId) {
 
 async function getOrderItems(orderId) {
   return dbAll(
-    `SELECT d.*, m.Menu_Name, m.Image_URL, m.Description, c.Category_Name
+    `SELECT d.*, m.Menu_Name, m.Image_URL, c.Category_Name
      FROM Order_Detail d
      JOIN Menu m ON d.Menu_ID = m.Menu_ID
      LEFT JOIN Category c ON m.Category_ID = c.Category_ID
